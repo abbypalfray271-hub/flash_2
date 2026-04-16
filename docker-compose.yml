@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # 古文闪背 - 前端 (Vite + Nginx)
+  guwen-frontend:
+    build: .
+    container_name: guwen-flashback-frontend
+    ports:
+      - "3005:80"
+    restart: always
+    networks:
+      - guwen-network
+
+  # 古文闪背 - 后端 (Node + SQLite)
+  guwen-backend:
+    build: ./server
+    container_name: guwen-flashback-backend
+    ports:
+      - "3006:3005"
+    volumes:
+      - ./server/data:/app/data
+    restart: always
+    networks:
+      - guwen-network
+
+networks:
+  guwen-network:
+    driver: bridge

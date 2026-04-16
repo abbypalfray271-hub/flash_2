@@ -1,0 +1,399 @@
+:root {
+  /* Genshin Impact Color Palette: Starry Abyss & Primogem Gold */
+  --bg: #111218;
+  --bg-gradient: radial-gradient(circle at top, #2a2d44 0%, #111218 100%);
+  --card-bg: rgba(42, 45, 68, 0.75);
+  --card-bg-hover: rgba(58, 62, 88, 0.9);
+  --text-main: #ece5d8; /* Paimon White / Parchment */
+  --text-dim: #9496a5;
+  --accent: #ffc107; /* Primogem Gold */
+  --accent-soft: rgba(255, 193, 7, 0.15);
+  --accent-border: rgba(255, 193, 7, 0.4);
+  --element-anemo: #72e2c2;
+  --element-pyro: #ff7e5f;
+  --element-cryo: #99ffff;
+  --element-electro: #ca8eff;
+  --element-geo: #e6b12a;
+  --element-hydro: #4facee;
+  --element-dendro: #a5c83b;
+  
+  --success: var(--element-anemo);
+  --error: #ff5f5f;
+  --border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(12px);
+  
+  /* Fonts */
+  --font-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  --font-serif: 'Noto Serif SC', serif;
+  
+  /* Spacing */
+  --container-max-width: 600px;
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#app {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  padding-bottom: 3rem;
+  position: relative;
+}
+
+/* Starry Sky Particle Effect (CSS only) */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 50px 160px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 80px 120px, #rgba(255,255,255,0.5), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 110px 210px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 150px 30px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 190px 110px, #fff, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.15;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Typography */
+h1, h2, h3 {
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.02em;
+}
+
+.guwen-text {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  letter-spacing: 0.1em;
+  color: #fff;
+}
+
+/* Layout Parts */
+.app-header {
+  margin-bottom: 2.5rem;
+  text-align: left;
+  border-left: 4px solid var(--accent);
+  padding-left: 15px;
+}
+
+.app-header h1 {
+  font-size: 1.6rem;
+  color: var(--text-main);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Category Tabs (Genshin Navigator Style) */
+.category-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  border-radius: 4px; /* Flatter buttons */
+  margin-bottom: 2rem;
+  border: 1px solid var(--border);
+  backdrop-filter: var(--glass-blur);
+}
+
+.category-tabs .tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: var(--text-dim);
+  position: relative;
+  overflow: hidden;
+}
+
+.category-tabs .tab.active {
+  color: var(--accent);
+}
+
+.category-tabs .tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 15%; width: 70%; height: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* Poem Card (Genshin Collection Style) */
+.poem-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--text-dim); /* Default Rarity */
+  padding: 1.2rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  backdrop-filter: var(--glass-blur);
+}
+
+.poem-card:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--accent-border);
+  transform: translateX(5px);
+}
+
+.poem-card.mastered {
+  border-left-color: var(--accent);
+  background: linear-gradient(90deg, rgba(255, 193, 7, 0.1), var(--card-bg));
+}
+
+.poem-info h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.2rem;
+}
+
+.poem-meta {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Flashcard Area (Restore 3D Flip) */
+.flashcard-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 2rem;
+}
+
+.card-container {
+  perspective: 1500px;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  max-height: 520px;
+  position: relative;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+/* 强制物理隔离：确保翻转时背面不可见 */
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  background: #2a2d44; /* 纯色背景增强隔离 */
+  border: 2px solid var(--accent-border);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem; /* 顶部预留足够空间 */
+  text-align: center;
+  box-shadow: 0 15px 45px rgba(0,0,0,0.6), inset 0 0 30px rgba(255, 193, 7, 0.05);
+  backdrop-filter: var(--glass-blur);
+  overflow-y: auto; /* 长文本滚动 */
+}
+
+/* 智能对齐：短文本居中，长文本置顶 */
+.card-face > *:first-child {
+  margin-top: auto;
+}
+
+.card-face > *:last-child {
+  margin-bottom: auto;
+}
+
+/* 翻转时的可见性微调 */
+.card-front {
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
+.card-back {
+  z-index: 1;
+  transform: rotateY(180deg);
+  background: linear-gradient(135deg, #1b1d2a, #2a2d44);
+}
+
+/* 增强隔离：处于背面时隐藏正面文字 */
+.card-inner.flipped .card-front { opacity: 0; pointer-events: none; }
+.card-inner:not(.flipped) .card-back { opacity: 0; pointer-events: none; }
+
+.card-face .text {
+  font-size: 1.5rem;
+  line-height: 1.7;
+  word-break: break-all;
+}
+
+/* 如果文字极多，自动缩小字号 */
+.card-face .text:has(+ * + .hint):not(:empty) {
+  font-size: 1.3rem;
+}
+
+.card-face .hint {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--accent);
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.8rem 1.8rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 120px;
+  position: relative;
+  /* Diamond cut effect */
+  border-radius: 2px;
+  clip-path: polygon(
+    10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%
+  );
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #111;
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  backdrop-filter: var(--glass-blur);
+}
+
+.btn:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* Modal UI */
+.eggy-card, .eggy-registration-overlay {
+  /* We will override these in JS or keep classes for now but change their styles here */
+  border-radius: 4px !important;
+  border: 1px solid var(--accent-border) !important;
+  background: var(--bg-gradient) !important;
+}
+
+/* Mastered Seal -> Stars or Gilded Badge */
+.mastered-seal {
+  border: 1px solid var(--accent) !important;
+  color: var(--accent) !important;
+  border-radius: 0 !important;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: var(--accent-soft);
+  box-shadow: 0 0 10px var(--accent);
+  transform: rotate(0deg) !important;
+  animation: none !important;
+}
+
+
+/* Keyword & Tooltip System */
+.keyword-highlight {
+  cursor: help;
+  color: var(--accent);
+  text-decoration: underline dashed 2px var(--accent-border);
+  text-underline-offset: 4px;
+  transition: all 0.2s;
+  padding: 0 2px;
+}
+
+.keyword-highlight:hover {
+  background: rgba(255, 193, 7, 0.15);
+  text-decoration-style: solid;
+}
+
+.kw-tooltip {
+  position: absolute;
+  background: rgba(30, 32, 45, 0.95);
+  color: var(--text-main);
+  padding: 10px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  font-size: 0.85rem;
+  max-width: 280px;
+  z-index: 9999;
+  pointer-events: none;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  font-weight: 500;
+  line-height: 1.6;
+  backdrop-filter: blur(10px);
+  animation: tooltipFadeUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes tooltipFadeUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+  .app-header {
+    margin-bottom: 2rem;
+  }
+  .poem-card {
+    padding: 1rem;
+  }
+}

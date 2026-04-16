@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+*.db
+server/node_modules
+server/dist
+server/data/*.db
+.DS_Store
+scratch/
