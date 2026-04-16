@@ -2,7 +2,7 @@ import type { Poem } from '../types';
 import { navigate } from '../utils/router';
 import { markSentenceMastered } from '../utils/storage';
 import { playClip } from './AudioPlayer';
-import { getRandomReward, type Reward } from '../utils/rewards';
+import { getRandomReward } from '../utils/rewards';
 
 export function renderChainChallenge(poem: Poem) {
   let currentIndex = 0;

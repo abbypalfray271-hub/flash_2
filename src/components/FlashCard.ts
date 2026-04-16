@@ -97,7 +97,7 @@ function showTooltip(target: HTMLElement) {
   }, 10);
 
   // 2. 3秒后自动消失 (如果还没被点击清除)
-  const timer = setTimeout(() => {
+  setTimeout(() => {
     if (tooltip.parentElement) {
        tooltip.remove();
        document.removeEventListener('click', clearTooltips);
