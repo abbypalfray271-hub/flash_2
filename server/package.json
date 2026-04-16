@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "backup": "ts-node --esm src/backup.ts"
+    "backup": "node dist/backup.js"
   },
   "keywords": [],
   "author": "",
