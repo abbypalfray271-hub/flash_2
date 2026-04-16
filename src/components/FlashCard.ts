@@ -36,6 +36,7 @@ function highlightKeywords(text: string, keywords: Keyword[]): string {
           end: m.index + kw.word.length,
           kw: kw
         });
+        break; // 找到第一个非重叠匹配项后立即跳出，实现“一词一显”
       }
     }
   }
@@ -129,10 +130,25 @@ export function renderFlashCard(poem: Poem) {
   cardContainer.appendChild(cardInner);
   container.appendChild(cardContainer);
 
-  // 获取当前句子相关的关键词
-  const getRelevantKeywords = (sentenceText: string): Keyword[] => {
+  // 预热逻辑：计算每个关键词在全文中的首次出现“话号”（Sentence Index）
+  // 确保“全篇去重”逻辑在单句翻页模式下也能生效
+  const keywordFirstOccurrence = new Map<string, number>();
+  const allKeywords = poem.keywords || [];
+  poem.sentences.forEach((s, sIdx) => {
+    allKeywords.forEach(kw => {
+      if (!keywordFirstOccurrence.has(kw.word) && s.text.includes(kw.word)) {
+        keywordFirstOccurrence.set(kw.word, sIdx);
+      }
+    });
+  });
+
+  // 获取当前句子相关的关键词（仅包含在本句中首次出现的词）
+  const getRelevantKeywords = (sentenceText: string, sentenceIndex: number): Keyword[] => {
     if (!poem.keywords) return [];
-    return poem.keywords.filter(kw => sentenceText.includes(kw.word));
+    return poem.keywords.filter(kw => 
+      sentenceText.includes(kw.word) && 
+      keywordFirstOccurrence.get(kw.word) === sentenceIndex
+    );
   };
 
   const updateCard = () => {
@@ -162,7 +178,7 @@ export function renderFlashCard(poem: Poem) {
     } else {
       // 单句模式 (常规)
       const sentence = poem.sentences[currentIndex];
-      const relevantKw = getRelevantKeywords(sentence.text);
+      const relevantKw = getRelevantKeywords(sentence.text, currentIndex);
       const highlightedText = highlightKeywords(sentence.text, relevantKw);
 
       cardFront.innerHTML = `

@@ -29,6 +29,10 @@
   /* Spacing */
   --container-max-width: 600px;
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  
+  /* Teyvat Specifics */
+  --tiyvat-gold: #f0c85e;
+  --tiyvat-blue-dark: #1b263b;
 }
 
 * {
@@ -323,24 +327,100 @@ h1, h2, h3 {
   opacity: 0.8;
 }
 
-/* Modal UI */
-.eggy-card, .eggy-registration-overlay {
-  /* We will override these in JS or keep classes for now but change their styles here */
-  border-radius: 4px !important;
-  border: 1px solid var(--accent-border) !important;
-  background: var(--bg-gradient) !important;
+/* Teyvat Authentication Overlay (Genshin Wish/Contract Style) */
+.tiyvat-auth-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at center, #1b263b 0%, #0d1b2a 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 4000;
+  animation: fadeIn 1s ease;
+  overflow: hidden;
+}
+
+.tiyvat-auth-overlay::before {
+  content: "";
+  position: absolute;
+  width: 200%; height: 200%;
+  background: url('https://www.transparenttextures.com/patterns/stardust.png');
+  opacity: 0.1;
+  animation: rotateSlow 100s linear infinite;
+}
+
+/* Teyvat Card Base */
+.tiyvat-card {
+  background: rgba(13, 27, 42, 0.85);
+  border: 1px solid var(--accent-border);
+  backdrop-filter: blur(25px);
+  padding: 2.5rem 1.5rem;
+  border-radius: 4px;
+  position: relative;
+  box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(255,193,7,0.05);
+  animation: tiyvatPopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Corner Accents */
+.tiyvat-card::after {
+  content: "";
+  position: absolute;
+  top: 8px; left: 8px; width: 12px; height: 12px;
+  border-top: 2px solid var(--accent);
+  border-left: 2px solid var(--accent);
+}
+
+.tiyvat-card::before {
+  content: "";
+  position: absolute;
+  bottom: 8px; right: 8px; width: 12px; height: 12px;
+  border-bottom: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+}
+
+/* Input Fields */
+.tiyvat-input {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,193,7,0.3);
+  color: #fff;
+  border-radius: 4px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.tiyvat-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(255,193,7,0.2);
+}
+
+/* Badges & Medals */
+.badge-honor {
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-soft);
+  clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
 }
 
 /* Mastered Seal -> Stars or Gilded Badge */
 .mastered-seal {
-  border: 1px solid var(--accent) !important;
-  color: var(--accent) !important;
-  border-radius: 0 !important;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 4px 8px;
+  font-size: 0.6rem;
+  font-weight: 900;
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   background: var(--accent-soft);
   box-shadow: 0 0 10px var(--accent);
-  transform: rotate(0deg) !important;
-  animation: none !important;
 }
 
 
@@ -377,15 +457,19 @@ h1, h2, h3 {
   animation: tooltipFadeUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
 }
 
-@keyframes tooltipFadeUp {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 10px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes tiyvatPopIn {
+  0% { transform: scale(0.9) translateY(20px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes tiyvatGlow {
+  0%, 100% { filter: drop-shadow(0 0 5px var(--accent)); }
+  50% { filter: drop-shadow(0 0 15px var(--accent)); }
 }
 
 /* Mobile Optimizations */

@@ -41,94 +41,94 @@ export function renderPoemList(builtInPoems: Poem[]) {
   const container = document.createElement('div');
   container.className = 'poem-list-view';
 
-  // 这里的 userStats 需要提前获取
   const userStats = getUserStats();
 
-  // 头部
+  // 头部 (Teyvat Character Panel Style)
   const header = document.createElement('header');
   header.className = 'app-header';
-  header.style.marginBottom = '1.5rem';
+  header.style.marginBottom = '2rem';
   header.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
       <div>
-        <h1 style="font-family: var(--font-serif); font-weight: 700; color: var(--accent); letter-spacing: 1px;">${userStats.nickname} <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-dim);">旅行者</span></h1>
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
-          <p style="color: var(--text-dim); font-size: 0.8rem; font-weight: 600;">冒险等阶 ${({7:'初一',8:'初二',9:'初三'} as Record<number,string>)[userStats.grade] || userStats.grade} · 探索提瓦特中</p>
-          <span class="badge-honor" style="background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 700;">${getAchievementTitle(masteredCount)}</span>
+        <h1 style="font-family: var(--font-serif); font-weight: 700; color: var(--accent); letter-spacing: 2px; margin: 0;">
+          ${userStats.nickname} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-dim); opacity: 0.8;">· 旅行者</span>
+        </h1>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px;">
+          <p style="color: var(--text-dim); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+            冒险等阶 ${({7:'初一',8:'初二',9:'初三'} as Record<number,string>)[userStats.grade] || userStats.grade}
+          </p>
+          <span class="badge-honor">${getAchievementTitle(masteredCount)}</span>
         </div>
       </div>
-      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-        <button id="admin-toggle" class="btn" style="padding: 0.4rem 0.6rem; font-size: 0.75rem; border: 2px solid #6BCBFF; background: transparent; color: #6BCBFF; border-radius: 12px; font-weight: bold;">
-          ${isAdmin() ? '已解锁管理' : '管理锁'}
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button id="admin-toggle" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.7rem; border-color: var(--border); letter-spacing: 1px;">
+          ${isAdmin() ? '已解锁权限' : '权限锁定'}
         </button>
       </div>
     </div>
   `;
   container.appendChild(header);
 
-  // 打卡状态
+  // 今日委托 (Daily Commission Banner)
   const today = getTodayStr();
   const isCheckedIn = userStats.lastCheckInDate === today;
 
   const checkInArea = document.createElement('div');
-  checkInArea.className = 'checkin-banner card';
+  checkInArea.className = 'tiyvat-reward-panel card';
   checkInArea.style.cssText = `
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 1rem; margin-bottom: 2rem; border: 1px solid var(--accent-border);
-    background: linear-gradient(to right, var(--accent-soft), transparent);
+    padding: 1.5rem; margin-bottom: 2.2rem; border: 1px solid var(--accent-border);
+    background: linear-gradient(135deg, rgba(255,193,7,0.05) 0%, transparent 100%);
+    position: relative; overflow: hidden;
   `;
   
   checkInArea.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <div style="font-size: 1.5rem;">🔥</div>
-      <div>
-        <div style="font-size: 0.9rem; font-weight: bold; letter-spacing: 1px;">连续探索 ${userStats.checkInStreak} 天</div>
-        <div id="eggy-reward-info" style="margin-top: 12px; cursor: help;">
-          <div style="font-size: 0.8rem; color: var(--accent); font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 4px; text-transform: uppercase;">
-            神之眼与圣遗物 <span style="font-size: 0.6rem; opacity: 0.7;">(点击查看攻略ⓘ)</span>
-          </div>
-          <div style="display: flex; gap: 16px; padding: 12px 6px;">
-            ${['风神瞳', '原石', '纠缠之缘', '神之眼'].map((t, i) => {
-              const days = [3, 7, 15, 30][i];
-              const hasIt = userStats.masteredTools.includes(t);
-              const activeStyle = hasIt ? `
-                position: relative; width: 54px; height: 54px;
-                display: flex; align-items: center; justify-content: center;
-                background: var(--accent-soft); border: 2px solid var(--accent);
-                box-shadow: 0 0 15px rgba(255, 193, 7, 0.3); border-radius: 4px;
-              ` : `
-                width: 54px; height: 54px; border-radius: 4px; background: rgba(0,0,0,0.3);
-                border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
-              `;
-
-              return `
-                <div title="${hasIt ? `已获得：${t}` : `连续探索 ${days} 天解锁`}" style="${activeStyle}">
-                  <div style="
-                    width: 44px; height: 44px; 
-                    display: flex; align-items: center; justify-content: center;
-                    font-size: 1.6rem; transition: all 0.3s;
-                  ">
-                    <span style="opacity: ${hasIt ? 1 : 0.15}; filter: ${hasIt ? 'none' : 'grayscale(1)'};">
-                      ${t === '风神瞳' ? '💠' : t === '原石' ? '✨' : t === '纠缠之缘' ? '🌑' : '💎'}
-                    </span>
-                    ${!hasIt ? `<div style="position: absolute; bottom: 3px; font-size: 0.55rem; color: #555; font-weight: 900;">${days}D</div>` : ''}
-                  </div>
-                </div>`;
-            }).join('')}
-          </div>
+    <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.2rem; filter: drop-shadow(0 0 5px var(--accent));">✦</span>
+          <span style="font-size: 0.95rem; font-weight: 800; letter-spacing: 2px; color: #fff;">今日委托进展</span>
+          <span style="font-size: 0.75rem; color: var(--accent); font-weight: 600; margin-left: 8px;">连续 ${userStats.checkInStreak} 天</span>
         </div>
-        <div id="reward-hint" style="display:none; font-size: 0.72rem; color: var(--accent); margin-top: 16px; padding: 14px; background: rgba(255,193,7,0.1); border-radius: 4px; border: 1px dashed var(--accent); animation: eggyPop 0.3s; line-height: 1.5;">
-          📅 **冒险指南**：通过每日探索获得**原石与神之眼**！连续探索 **3/7/15/30** 天即可解锁。
+        <button id="btn-checkin" class="btn ${isCheckedIn ? 'btn-secondary' : 'btn-primary'}" style="padding: 0.4rem 1.2rem; font-size: 0.8rem;" ${isCheckedIn ? 'disabled' : ''}>
+          ${isCheckedIn ? '委托已毕' : '开启委托'}
+        </button>
+      </div>
+
+      <div id="tiyvat-reward-info" style="cursor: help;">
+        <div style="display: flex; gap: 14px; justify-content: flex-start;">
+          ${['风神瞳', '原石', '纠缠之缘', '神之眼'].map((t, i) => {
+            const days = [3, 7, 15, 30][i];
+            const hasIt = userStats.masteredTools.includes(t);
+            const activeStyle = hasIt ? `
+              position: relative; width: 52px; height: 52px;
+              display: flex; align-items: center; justify-content: center;
+              background: var(--accent-soft); border: 2px solid var(--accent);
+              box-shadow: 0 0 15px rgba(255, 193, 7, 0.2); border-radius: 4px;
+            ` : `
+              width: 52px; height: 52px; border-radius: 4px; background: rgba(0,0,0,0.3);
+              border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center;
+              position: relative;
+            `;
+
+            return `
+              <div title="${hasIt ? `已获得：${t}` : `累计探索 ${days} 天解锁`}" style="${activeStyle}">
+                <div style="font-size: 1.6rem; opacity: ${hasIt ? 1 : 0.2}; filter: ${hasIt ? 'none' : 'grayscale(1)'};">
+                  ${t === '风神瞳' ? '💠' : t === '原石' ? '✨' : t === '纠缠之缘' ? '🌑' : '💎'}
+                </div>
+                ${!hasIt ? `<div style="position: absolute; bottom: 4px; font-size: 0.5rem; color: var(--text-dim); font-weight: 800;">${days}D</div>` : ''}
+              </div>`;
+          }).join('')}
         </div>
       </div>
+      
+      <div id="reward-hint" style="display:none; font-size: 0.75rem; color: var(--accent); margin-top: 5px; padding: 12px; background: rgba(255,193,7,0.05); border: 1px dashed var(--accent-border); animation: tiyvatPopIn 0.3s; line-height: 1.6;">
+        📅 **冒险指南**：每日完成至少一项挑战并“开启委托”，累计天数即可赢取**珍稀物资**。
+      </div>
     </div>
-    <button id="btn-checkin" class="btn ${isCheckedIn ? 'btn-secondary' : 'btn-primary'}" style="padding: 0.5rem 1rem; font-size: 0.85rem;" ${isCheckedIn ? 'disabled' : ''}>
-      ${isCheckedIn ? '今日委托已毕' : '开启今日委托'}
-    </button>
   `;
   container.appendChild(checkInArea);
 
-  checkInArea.querySelector('#eggy-reward-info')?.addEventListener('click', () => {
+  checkInArea.querySelector('#tiyvat-reward-info')?.addEventListener('click', () => {
     const hint = checkInArea.querySelector('#reward-hint') as HTMLElement;
     if (hint) hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
   });
@@ -137,21 +137,21 @@ export function renderPoemList(builtInPoems: Poem[]) {
     const result = performCheckIn();
     if (result.success) {
       showCheckInModal(result.streak, getUserStats().masteredTools, poems, () => {
-        window.location.reload(); // 刷新以更新状态
+        window.location.reload(); 
       });
     }
   });
 
-  // 管理菜单 (仅在管理员模式显示)
+  // 管理菜单 (Only Admin)
   if (isAdmin()) {
     const adminActions = document.createElement('div');
-    adminActions.className = 'card';
-    adminActions.style.cssText = `margin-bottom: 1.5rem; padding: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap; background: rgba(255,191,0,0.05); border: 1px dashed var(--accent);`;
+    adminActions.className = 'tiyvat-card';
+    adminActions.style.cssText = `margin-bottom: 2rem; padding: 1rem; display: flex; gap: 0.8rem; flex-wrap: wrap; background: rgba(255,193,7,0.03);`;
     adminActions.innerHTML = `
-      <button id="nav-add" class="btn btn-primary" style="flex: 1; min-width: 120px; font-size: 0.85rem;">+ 录入新篇</button>
-      <button id="btn-export" class="btn btn-secondary" style="flex: 1; min-width: 80px; font-size: 0.85rem;">📥 备份</button>
-      <button id="btn-import-trigger" class="btn btn-secondary" style="flex: 1; min-width: 80px; font-size: 0.85rem;">📤 恢复</button>
-      <button id="admin-logout" class="btn" style="font-size: 0.85rem; color: #ff4444;">锁定</button>
+      <button id="nav-add" class="btn btn-primary" style="flex: 1; min-width: 120px; font-size: 0.8rem;">+ 录入新篇</button>
+      <button id="btn-export" class="btn btn-secondary" style="flex: 1; min-width: 80px; font-size: 0.8rem;">📥 备份</button>
+      <button id="btn-import-trigger" class="btn btn-secondary" style="flex: 1; min-width: 80px; font-size: 0.8rem;">📤 恢复</button>
+      <button id="admin-logout" class="btn" style="font-size: 0.8rem; color: var(--error); border-color: var(--error); opacity: 0.8;">锁定存档</button>
       <input type="file" id="import-file" style="display: none;" accept=".json">
     `;
     container.appendChild(adminActions);
@@ -166,10 +166,10 @@ export function renderPoemList(builtInPoems: Poem[]) {
       if (!file) return;
       const text = await file.text();
       if (importBackup(text)) {
-        alert('恢复成功！');
+        alert('存档恢复成功！');
         window.location.reload();
       } else {
-        alert('恢复失败，文件格式有误');
+        alert('文件解析失败，请检查格式');
       }
     });
 
@@ -181,18 +181,18 @@ export function renderPoemList(builtInPoems: Poem[]) {
 
   // 搜索框
   const searchContainer = document.createElement('div');
-  searchContainer.style.marginBottom = '1.5rem';
+  searchContainer.style.marginBottom = '1.8rem';
   searchContainer.innerHTML = `
-    <input type="text" id="poem-search" placeholder="搜索篇名或作者..." 
-      style="width: 100%; padding: 0.75rem 1rem; border-radius: 12px; background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); font-size: 1rem; outline: none;">
+    <input type="text" id="poem-search" class="tiyvat-input" placeholder="搜索篇目、作者、名句..." 
+      style="padding-left: 1.2rem; letter-spacing: 1px;">
   `;
   container.appendChild(searchContainer);
 
   const tabContainer = document.createElement('div');
   tabContainer.className = 'category-tabs';
   tabContainer.innerHTML = `
-    <div class="tab active" data-category="prose">文言文</div>
-    <div class="tab" data-category="poetry">古诗词</div>
+    <div class="tab active" data-category="prose">文言文 (Prose)</div>
+    <div class="tab" data-category="poetry">古诗词 (Poetry)</div>
   `;
   container.appendChild(tabContainer);
 
@@ -218,13 +218,13 @@ export function renderPoemList(builtInPoems: Poem[]) {
         if (semesterPoems.length === 0) return;
 
         const section = document.createElement('section');
-        section.style.marginBottom = '2rem';
+        section.style.marginBottom = '2.2rem';
         const semesterLabel = semester === 1 ? '上学期' : '下学期';
         const isUserGrade = grade === userStats.grade;
         section.innerHTML = `
-          <h2 style="margin-bottom: 1rem; font-size: 1.1rem; color: ${isUserGrade ? 'var(--accent)' : 'var(--text-dim)'}; display: flex; align-items: center; gap: 8px;">
-            ${({7:'初一',8:'初二',9:'初三'} as Record<number,string>)[grade] || grade+'年级'} ${semesterLabel}
-            ${isUserGrade ? '<span style="font-size: 0.6rem; background: var(--accent); color: #000; padding: 2px 6px; border-radius: 10px;">当前年级</span>' : ''}
+          <h2 style="margin-bottom: 1.2rem; font-size: 1rem; color: ${isUserGrade ? 'var(--accent)' : 'var(--text-dim)'}; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;">
+            ${({7:'初一',8:'初二',9:'初三'} as Record<number,string>)[grade] || grade+'年级'} · ${semesterLabel}
+            ${isUserGrade ? '<span class="badge-honor" style="margin-left: 8px; font-size: 0.6rem;">当前等阶</span>' : ''}
           </h2>
         `;
 
@@ -236,24 +236,24 @@ export function renderPoemList(builtInPoems: Poem[]) {
           card.className = `poem-card ${percent === 100 ? 'mastered' : ''}`;
           card.style.position = 'relative'; 
           card.innerHTML = `
-            ${percent === 100 ? '<div class="mastered-seal" style="font-size:0.6rem;">MAX</div>' : ''}
+            ${percent === 100 ? '<div class="mastered-seal" style="font-size:0.55rem;">MAX</div>' : ''}
             <div class="poem-info">
-              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
-                <h3 style="margin: 0;">${poem.title}</h3>
-                ${(poem as any).isModified ? '<span style="font-size: 0.65rem; background: rgba(255,191,0,0.15); color: var(--accent); padding: 1px 4px; border-radius: 4px;">已修正</span>' : ''}
-                ${poem.isCustom && !(poem as any).isModified ? '<span style="font-size: 0.65rem; background: rgba(0,255,150,0.1); color: #00ff96; padding: 1px 4px; border-radius: 4px;">自建</span>' : ''}
+              <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.2rem;">
+                <h3 style="margin: 0; font-size: 1.15rem;">${poem.title}</h3>
+                ${(poem as any).isModified ? '<span style="font-size: 0.6rem; color: var(--accent); opacity: 0.8; font-weight: 800;">[修正]</span>' : ''}
+                ${poem.isCustom && !(poem as any).isModified ? '<span style="font-size: 0.6rem; color: var(--element-anemo); font-weight: 800;">[自建]</span>' : ''}
               </div>
-              <div class="poem-meta">${poem.author} · ${poem.sentences.length}句</div>
+              <div class="poem-meta">${poem.author} · ${poem.sentences.length} 句</div>
             </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              ${isAdmin() ? `<button class="btn-edit" style="background: none; border: none; color: var(--accent); font-size: 1.1rem; cursor: pointer;">✏️</button>` : ''}
-              ${isAdmin() && poem.isCustom && !(poem as any).isModified ? `<button class="btn-delete" style="background: none; border: none; color: #ff4444; font-size: 1.1rem; cursor: pointer;">🗑️</button>` : ''}
+            <div style="display: flex; align-items: center; gap: 1.2rem;">
+              ${isAdmin() ? `<button class="btn-edit" style="background: none; border: none; color: var(--accent); font-size: 1rem; cursor: pointer; opacity: 0.6;">✏️</button>` : ''}
+              ${isAdmin() && poem.isCustom && !(poem as any).isModified ? `<button class="btn-delete" style="background: none; border: none; color: var(--error); font-size: 1rem; cursor: pointer; opacity: 0.6;">🗑️</button>` : ''}
               <div class="poem-progress">
                  <svg viewBox="0 0 36 36" style="width: 44px; height: 44px; transform: rotate(-90deg);">
                     <circle cx="18" cy="18" r="16" fill="none" stroke="var(--border)" stroke-width="3" />
                     <circle cx="18" cy="18" r="16" fill="none" stroke="var(--accent)" stroke-width="3" 
                       stroke-dasharray="${percent}, 100" stroke-linecap="round" />
-                    <text x="18" y="-14" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--text-main)" transform="rotate(90)" dy="0.35em">${percent}%</text>
+                    <text x="18" y="-14" text-anchor="middle" font-size="9" font-weight="900" fill="var(--text-main)" transform="rotate(90)" dy="0.35em">${percent}%</text>
                   </svg>
               </div>
             </div>
@@ -264,7 +264,7 @@ export function renderPoemList(builtInPoems: Poem[]) {
             if (target.closest('.btn-edit')) {
               navigate('edit', poem.id);
             } else if (target.closest('.btn-delete')) {
-              if (confirm(`确定要删除《${poem.title}》吗？`)) {
+              if (confirm(`确定要删除存档《${poem.title}》吗？`)) {
                 deleteCustomPoem(poem.id);
                 window.location.reload();
               }
@@ -281,7 +281,7 @@ export function renderPoemList(builtInPoems: Poem[]) {
     });
 
     if (listContainer.innerHTML === '') {
-      listContainer.innerHTML = `<div style="text-align: center; padding: 4rem 1rem; color: var(--text-dim);">未找到相关篇目</div>`;
+      listContainer.innerHTML = `<div style="text-align: center; padding: 5rem 1rem; color: var(--text-dim); letter-spacing: 1px; font-size: 0.9rem;">暂无与之共鸣的篇目</div>`;
     }
   };
 
