@@ -16,7 +16,7 @@ services:
     build: ./server
     container_name: guwen-flash-2-backend
     ports:
-      - "3006:3005"
+      - "3008:3005"
     volumes:
       - ./server/data:/app/data
     restart: always
