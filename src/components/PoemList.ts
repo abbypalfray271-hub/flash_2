@@ -243,7 +243,10 @@ export function renderPoemList(builtInPoems: Poem[]) {
                 ${(poem as any).isModified ? '<span style="font-size: 0.6rem; color: var(--accent); opacity: 0.8; font-weight: 800;">[修正]</span>' : ''}
                 ${poem.isCustom && !(poem as any).isModified ? '<span style="font-size: 0.6rem; color: var(--element-anemo); font-weight: 800;">[自建]</span>' : ''}
               </div>
-              <div class="poem-meta">${poem.author} · ${poem.sentences.length} 句</div>
+              <div class="poem-meta">
+                ${poem.dynasty && poem.dynasty !== '不详' ? `<span style="border: 1px solid var(--border); padding: 0 4px; border-radius: 2px; margin-right: 4px; font-size: 0.6rem;">${poem.dynasty}</span>` : ''}
+                ${poem.author} · ${poem.sentences.length} 句
+              </div>
             </div>
             <div style="display: flex; align-items: center; gap: 1.2rem;">
               ${isAdmin() ? `<button class="btn-edit" style="background: none; border: none; color: var(--accent); font-size: 1rem; cursor: pointer; opacity: 0.6;">✏️</button>` : ''}

@@ -9,6 +9,10 @@ import { getCustomPoems, getAllOverrides, getUserStats } from './utils/storage';
 import { renderRegistration } from './components/Registration';
 import poemsData from './data/poems.json';
 import type { Poem } from './types';
+import { initGlobalErrorHandling, showErrorUI } from './utils/debug';
+
+// 启动异常监控
+initGlobalErrorHandling();
 
 const builtInPoems = poemsData as Poem[];
 const appElement = document.querySelector<HTMLDivElement>('#app')!;
@@ -61,9 +65,17 @@ function updateApp() {
 
 
 // Initial render
-updateApp();
+try {
+  updateApp();
+} catch (e) {
+  showErrorUI(`[Bootstrap Error]\n${e instanceof Error ? e.message : String(e)}\nStack: ${e instanceof Error ? e.stack : 'No stack'}`);
+}
 
 // Listen for navigation
 listenToHashChange(() => {
-  updateApp();
+  try {
+    updateApp();
+  } catch (e) {
+    showErrorUI(`[Navigation Error]\n${e instanceof Error ? e.message : String(e)}`);
+  }
 });

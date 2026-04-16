@@ -17,21 +17,51 @@ export function renderRegistration(onComplete: () => void) {
   card.style.width = '92%';
   card.style.maxWidth = '420px';
 
+  const renderHeader = (icon: string, title: string, subtitle: string, glow: boolean = false) => `
+    <div class="tiyvat-header">
+      <div class="tiyvat-header-icon ${glow ? 'glow' : ''}">${icon}</div>
+      <h2 class="tiyvat-header-title liyue-title">${title}</h2>
+      <p class="tiyvat-header-sub liyue-sub">${subtitle}</p>
+    </div>
+  `;
+
+  const getPinHtml = (className: string, justify: string = 'space-between') => `
+    <div style="display: flex; gap: 12px; justify-content: ${justify}; margin-top: 10px;">
+      ${[0,1,2,3].map(() => `<input type="tel" maxlength="1" class="${className} tiyvat-pin-base">`).join('')}
+    </div>
+  `;
+
+  const bindPinEvents = (inputs: NodeListOf<HTMLInputElement>) => {
+    inputs.forEach((input, idx) => {
+      input.addEventListener('input', () => { 
+        input.style.borderColor = 'var(--accent)';
+        if (input.value && idx < 3) inputs[idx+1].focus(); 
+      });
+      input.addEventListener('keydown', (e) => { 
+        if (e.key === 'Backspace' && !input.value && idx > 0) {
+          inputs[idx-1].focus();
+          inputs[idx].style.borderColor = 'rgba(255,255,255,0.1)';
+        }
+      });
+    });
+  };
+
   const renderContent = () => {
-    if (!isRegistered) {
-      showStep1();
-    } else {
-      showLogin();
+    try {
+      if (!isRegistered) {
+        showStep1();
+      } else {
+        showLogin();
+      }
+    } catch (err) {
+      console.error('Registration Render Error:', err);
+      onComplete(); // 降级处理：出错则直接进入主界面
     }
   };
 
   const showStep1 = () => {
     card.innerHTML = `
-      <div style="margin-bottom: 2.2rem; text-align: center;">
-        <div style="font-size: 3.5rem; margin-bottom: 0.8rem; filter: drop-shadow(0 0 10px var(--accent));">✨</div>
-        <h2 style="font-family: var(--font-serif); color: var(--text-main); font-size: 1.8rem; margin: 0; font-weight: 700; letter-spacing: 3px;">背诵契约</h2>
-        <p style="color: var(--accent); font-weight: bold; font-size: 0.8rem; margin-top: 8px; letter-spacing: 2px; opacity: 0.9; text-transform: uppercase;">Agreement from the Starry Abyss</p>
-      </div>
+      ${renderHeader('💠', '古文背诵 . 岩间契约', 'Contract of the Ancient Stones', true)}
 
       <div style="margin-bottom: 1.5rem; text-align: left;">
         <label style="color: var(--text-dim); font-weight: 600; font-size: 0.8rem; margin-left: 5px; text-transform: uppercase; letter-spacing: 1px;">旅者名谓 (Nickname)：</label>
@@ -64,11 +94,7 @@ export function renderRegistration(onComplete: () => void) {
 
   const showStep2 = (nick: string, grade: number) => {
     card.innerHTML = `
-      <div style="margin-bottom: 2.2rem; text-align: center;">
-        <div style="font-size: 3.5rem; margin-bottom: 0.8rem;">📜</div>
-        <h2 style="font-family: var(--font-serif); color: var(--text-main); font-size: 1.8rem; font-weight: 700;">通关文牒</h2>
-        <p style="color: var(--accent); font-weight: bold; font-size: 0.8rem; opacity: 0.9;">这是找回旅途存档的唯一凭证</p>
-      </div>
+      ${renderHeader('📜', '通关文牒', '这是找回旅途存档的唯一凭证')}
 
       <div style="margin-bottom: 1.5rem; text-align: left;">
         <label style="color: var(--text-dim); font-weight: 600; font-size: 0.8rem; margin-left: 5px; letter-spacing: 1px;">契约账号 (UID/Contact)：</label>
@@ -77,27 +103,14 @@ export function renderRegistration(onComplete: () => void) {
 
       <div style="margin-bottom: 2.5rem; text-align: left;">
         <label style="color: var(--text-dim); font-weight: 600; font-size: 0.8rem; margin-left: 5px; letter-spacing: 1px;">秘法口令 (4位 PIN)：</label>
-        <div style="display: flex; gap: 12px; justify-content: space-between; margin-top: 10px;">
-          ${[0,1,2,3].map(() => `<input type="tel" maxlength="1" class="tiyvat-pin" style="width: 3.8rem; height: 3.8rem; text-align: center; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--accent); font-size: 1.8rem; border-radius: 4px; outline: none; font-weight: 700;">`).join('')}
-        </div>
+        ${getPinHtml('tiyvat-pin')}
       </div>
 
       <button id="btn-finish" class="btn btn-primary" style="width: 100%;">登入提瓦特 (Launch)</button>
     `;
 
     const inputs = card.querySelectorAll<HTMLInputElement>('.tiyvat-pin');
-    inputs.forEach((input, idx) => {
-      input.addEventListener('input', () => { 
-        input.style.borderColor = 'var(--accent)';
-        if (input.value && idx < 3) inputs[idx+1].focus(); 
-      });
-      input.addEventListener('keydown', (e) => { 
-        if (e.key === 'Backspace' && !input.value && idx > 0) {
-          inputs[idx-1].focus();
-          inputs[idx].style.borderColor = 'rgba(255,255,255,0.1)';
-        }
-      });
-    });
+    bindPinEvents(inputs);
 
     card.querySelector('#btn-finish')?.addEventListener('click', async () => {
       const contact = (card.querySelector('#reg-contact') as HTMLInputElement).value.trim();
@@ -105,7 +118,7 @@ export function renderRegistration(onComplete: () => void) {
       if (!contact || pin.length < 4) return alert('契约信息不完整，无法登入');
       
       const btn = card.querySelector('#btn-finish') as HTMLButtonElement;
-      btn.innerText = '正在缔结契约...';
+      btn.innerText = '正在刻录契约...';
       btn.disabled = true;
 
       const newStats = { ...getUserStats(), nickname: nick, grade, contact, pin };
@@ -117,25 +130,19 @@ export function renderRegistration(onComplete: () => void) {
 
   const showLogin = () => {
     card.innerHTML = `
-      <div style="margin-bottom: 2.2rem; text-align: center;">
-        <div style="font-size: 3.5rem; margin-bottom: 0.8rem;">🌓</div>
-        <h2 style="font-family: var(--font-serif); color: var(--text-main); font-size: 1.8rem; font-weight: 700;">欢迎回来，旅者</h2>
-        <p style="color: var(--accent); font-weight: bold; font-size: 0.8rem; opacity: 0.9;">唤醒沉睡在星海中的记忆</p>
-      </div>
+      ${renderHeader('🏮', '归航璃月，旅者', '唤醒如岩石般坚定的契约')}
 
       <div style="margin-bottom: 1.5rem; text-align: left;">
         <input type="text" id="login-contact" class="tiyvat-input" placeholder="输入您的契约号" style="text-align: center;">
       </div>
 
       <div style="margin-bottom: 2.5rem;">
-        <div style="display: flex; gap: 12px; justify-content: center;">
-          ${[0,1,2,3].map(() => `<input type="tel" maxlength="1" class="tiyvat-pin-login" style="width: 3.5rem; height: 3.5rem; text-align: center; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--accent); font-size: 1.8rem; border-radius: 4px; outline: none; font-weight: 700;">`).join('')}
-        </div>
+        ${getPinHtml('tiyvat-pin-login', 'center')}
       </div>
 
-      <button id="btn-login" class="btn btn-primary" style="width: 100%;">开始旅途 (Return)</button>
+      <button id="btn-login" class="btn btn-primary" style="width: 100%;">确认契约 (Confirm)</button>
       <div id="go-to-reg" style="margin-top: 1.8rem; color: var(--text-dim); font-size: 0.8rem; cursor: pointer; text-decoration: underline; font-weight: 600; letter-spacing: 1px;">
-        初抵提瓦特的旅者？ (重新注册)
+        初抵璃月的旅者？ (重新签署)
       </div>
     `;
 
@@ -144,20 +151,14 @@ export function renderRegistration(onComplete: () => void) {
     });
 
     const inputs = card.querySelectorAll<HTMLInputElement>('.tiyvat-pin-login');
-    inputs.forEach((input, idx) => {
-      input.addEventListener('input', () => { 
-        input.style.borderColor = 'var(--accent)';
-        if (input.value && idx < 3) inputs[idx+1].focus(); 
-      });
-      input.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && !input.value && idx > 0) inputs[idx-1].focus(); });
-    });
+    bindPinEvents(inputs);
 
     card.querySelector('#btn-login')?.addEventListener('click', async () => {
       const contact = (card.querySelector('#login-contact') as HTMLInputElement).value.trim();
       const pin = Array.from(inputs).map(i => i.value).join('');
       
       const btn = card.querySelector('#btn-login') as HTMLButtonElement;
-      btn.innerText = '正在寻回记忆...';
+      btn.innerText = '正在溯回岩层...';
       btn.disabled = true;
 
       const cloudData = await syncLogin(contact, pin);
@@ -181,9 +182,9 @@ export function renderRegistration(onComplete: () => void) {
   const showCelebration = () => {
     card.innerHTML = `
       <div style="padding: 2.5rem 0; text-align: center;">
-        <div style="font-size: 6rem; color: var(--accent); filter: drop-shadow(0 0 20px var(--accent-soft)); animation: tiyvatGlow 2s infinite;">✨</div>
-        <h2 style="color: var(--text-main); font-size: 2.2rem; font-weight: 700; font-family: var(--font-serif); margin-top: 1rem;">MAY YOU WIN</h2>
-        <p style="color: var(--text-dim); font-weight: 500; margin-top: 0.8rem; letter-spacing: 1px;">愿风神护佑你，${getUserStats().nickname}旅行者</p>
+        <div style="font-size: 6rem; color: #ffb703; filter: drop-shadow(0 0 20px rgba(255,183,3,0.5)); animation: liyueGlow 2s infinite;">💠</div>
+        <h2 style="color: var(--text-main); font-size: 2.2rem; font-weight: 700; font-family: var(--font-serif); margin-top: 1rem;">FIXED AS STONE</h2>
+        <p style="color: var(--text-dim); font-weight: 500; margin-top: 0.8rem; letter-spacing: 1px;">愿岩王帝君护佑你，${getUserStats().nickname}旅行者</p>
       </div>
     `;
     setTimeout(() => {
@@ -199,9 +200,54 @@ export function renderRegistration(onComplete: () => void) {
 
   const style = document.createElement('style');
   style.textContent = `
-    .tiyvat-btn-opt { padding: 12px; border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); border-radius: 2px; cursor: pointer; text-align: center; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; background: rgba(0,0,0,0.2); }
-    .tiyvat-btn-opt.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+    .tiyvat-auth-overlay {
+      background: radial-gradient(circle at center, #5c0d0d 0%, #1a0505 100%) !important;
+    }
+    .tiyvat-auth-overlay::before {
+      background: url('https://www.transparenttextures.com/patterns/handmade-paper.png');
+      opacity: 0.2;
+    }
+    .tiyvat-card {
+      background: rgba(28, 28, 28, 0.95) !important;
+      border: 1px solid #ffb70366 !important;
+      box-shadow: 0 0 60px rgba(0,0,0,0.9), inset 0 0 40px rgba(255,183,3,0.08) !important;
+    }
+    /* 璃月云雷纹护角 */
+    .tiyvat-card::after {
+      width: 30px; height: 30px; border-width: 3px; 
+      border-color: #ffb703 #ffb703 transparent transparent !important;
+      top: 12px; right: 12px; left: auto;
+    }
+    .tiyvat-card::before {
+      width: 30px; height: 30px; border-width: 3px; 
+      border-color: transparent transparent #ffb703 #ffb703 !important;
+      bottom: 12px; left: 12px; right: auto;
+    }
+
+    .tiyvat-header { margin-bottom: 2.2rem; text-align: center; }
+    .tiyvat-header-icon { font-size: 3.5rem; margin-bottom: 0.8rem; }
+    .tiyvat-header-icon.glow { filter: drop-shadow(0 0 15px #ffb703); }
+    .liyue-title { color: #ffb703 !important; text-shadow: 0 0 10px rgba(255,183,3,0.3); }
+    .liyue-sub { color: #d4cfc7 !important; opacity: 0.8; }
     
+    .tiyvat-pin-base { 
+      width: 3.8rem; height: 3.8rem; text-align: center; 
+      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,183,3,0.2); 
+      color: #ffb703; font-size: 1.8rem; border-radius: 2px;
+    }
+    
+    .tiyvat-input { border-color: rgba(255,183,3,0.3); background: rgba(0,0,0,0.4); }
+    .tiyvat-input:focus { border-color: #ffb703; box-shadow: 0 0 15px rgba(255,183,3,0.2); }
+
+    .btn-primary { background: linear-gradient(135deg, #ffb703, #e6a100) !important; color: #3d1c00 !important; font-weight: 900 !important; }
+
+    .tiyvat-btn-opt { padding: 12px; border: 1px solid rgba(255,183,3,0.1); color: #d4cfc7; border-radius: 2px; background: rgba(0,0,0,0.4); }
+    .tiyvat-btn-opt.active { background: rgba(255,183,3,0.15); color: #ffb703; border-color: #ffb703; }
+    
+    @keyframes liyueGlow {
+      0%, 100% { filter: drop-shadow(0 0 8px #ffb703); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 20px #ffb703); transform: scale(1.05); }
+    }
     @keyframes eggyShake {
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-5px); }

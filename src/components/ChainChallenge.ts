@@ -2,6 +2,7 @@ import type { Poem } from '../types';
 import { navigate } from '../utils/router';
 import { markSentenceMastered } from '../utils/storage';
 import { playClip } from './AudioPlayer';
+import { getRandomReward, type Reward } from '../utils/rewards';
 
 export function renderChainChallenge(poem: Poem) {
   let currentIndex = 0;
@@ -101,23 +102,61 @@ export function renderChainChallenge(poem: Poem) {
 
   const showResult = () => {
     const accuracy = Math.round((masteredCount / poem.sentences.length) * 100);
-    const starCount = accuracy >= 100 ? 3 : (accuracy >= 70 ? 2 : 1);
+    const reward = getRandomReward(accuracy);
     
+    // 注入结算特定样式
+    const styleId = 'liyue-result-style';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        .reward-card {
+          background: rgba(28, 28, 28, 0.95);
+          border: 1px solid #ffb70366;
+          border-radius: 4px;
+          padding: 2rem 1.5rem;
+          position: relative;
+          box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(255,183,3,0.05);
+          animation: rewardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+          text-align: center;
+        }
+        .reward-card::after { content: ""; position: absolute; top: 8px; left: 8px; width: 12px; height: 12px; border-top: 2px solid #ffb703; border-left: 2px solid #ffb703; }
+        .reward-card::before { content: ""; position: absolute; bottom: 8px; right: 8px; width: 12px; height: 12px; border-bottom: 2px solid #ffb703; border-right: 2px solid #ffb703; }
+        
+        .reward-icon {
+          font-size: 5rem;
+          margin-bottom: 1rem;
+          filter: drop-shadow(0 0 15px #ffb703);
+          animation: rewardGlow 2s infinite ease-in-out;
+        }
+        .reward-name { color: #ffb703; font-weight: 900; font-size: 1.4rem; margin-bottom: 1.5rem; letter-spacing: 2px; }
+        .reward-quote { font-style: italic; color: #ece5d8; line-height: 1.6; margin-bottom: 1rem; font-family: var(--font-serif); }
+        .reward-character { color: var(--text-dim); font-size: 0.8rem; text-align: right; margin-bottom: 2rem; }
+        
+        @keyframes rewardPop { 0% { transform: scale(0.8) translateY(20px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+        @keyframes rewardGlow { 0%, 100% { filter: drop-shadow(0 0 10px #ffb703); transform: scale(1); } 50% { filter: drop-shadow(0 0 25px #ffb703); transform: scale(1.1); } }
+      `;
+      document.head.appendChild(style);
+    }
+
     content.innerHTML = `
-      <div class="chain-item" style="text-align: center; padding: 3rem 1.5rem; background: rgba(30,32,45, 0.9); border: 1px solid var(--accent);">
-        <div style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent);">
-          ${'⭐'.repeat(starCount)}
+      <div class="reward-card">
+        <div class="reward-icon">${reward.icon}</div>
+        <div class="reward-name">${reward.name}</div>
+        
+        <div style="background: rgba(0,0,0,0.4); padding: 1.2rem; border-radius: 2px; margin-bottom: 2rem; border-left: 3px solid #ffb703;">
+          <div class="reward-quote">“${reward.quote}”</div>
+          <div class="reward-character">—— ${reward.character}</div>
         </div>
-        <h2 style="color: var(--accent); font-family: var(--font-serif); font-size: 1.8rem; margin-bottom: 0.5rem; letter-spacing: 2px;">背诵完毕</h2>
-        <div style="font-size: 1rem; margin-bottom: 1.5rem; color: var(--text-main);">
-          评级：<span style="color: var(--accent); font-weight: bold;">${accuracy >= 100 ? '完美' : '良好'}</span>
+
+        <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 2rem; letter-spacing: 1px;">
+          本次背诵正确率：<span style="color: #ffb703; font-weight: bold;">${accuracy}%</span><br>
+          (背对 ${masteredCount} / 合计 ${poem.sentences.length})
         </div>
-        <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 2.5rem; letter-spacing: 1px;">
-          本次共背对 ${masteredCount} 处 / 合计 ${poem.sentences.length} 处
-        </p>
+
         <div style="display: flex; flex-direction: column; gap: 1rem;">
-          <button id="restart-btn" class="btn btn-primary">再次尝试 (Restart)</button>
-          <button id="finish-btn" class="btn btn-secondary">返回列表 (Back)</button>
+          <button id="restart-btn" class="btn btn-primary">再次挑战 (Restart)</button>
+          <button id="finish-btn" class="btn btn-secondary" style="border-color: rgba(255,183,3,0.3)">收下奖励并返回 (Receive)</button>
         </div>
       </div>
     `;
@@ -141,6 +180,7 @@ export function renderChainChallenge(poem: Poem) {
     currentIndex++;
     updateChallenge();
   });
+
 
   failBtn.addEventListener('click', () => {
     currentIndex++;

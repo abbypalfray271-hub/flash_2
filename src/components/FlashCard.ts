@@ -71,7 +71,12 @@ function highlightKeywords(text: string, keywords: Keyword[]): string {
  */
 function showTooltip(target: HTMLElement) {
   // 清除已有气泡
-  document.querySelectorAll('.kw-tooltip').forEach(el => el.remove());
+  const clearTooltips = () => {
+    document.querySelectorAll('.kw-tooltip').forEach(el => el.remove());
+    document.removeEventListener('click', clearTooltips);
+  };
+  
+  clearTooltips();
   
   const tip = target.dataset.tip;
   if (!tip) return;
@@ -83,12 +88,21 @@ function showTooltip(target: HTMLElement) {
   document.body.appendChild(tooltip);
   
   const rect = target.getBoundingClientRect();
-  // 注意：CSS 中已经有 transform: translate(-50%, ...) 了，所以这里只需要设置 left 为中心
   tooltip.style.left = `${rect.left + rect.width / 2}px`;
   tooltip.style.top = `${rect.bottom + 10 + window.scrollY}px`;
   
-  // 自动消失
-  setTimeout(() => tooltip.remove(), 3000);
+  // 1. 点击屏幕任意处立即清除 (延迟绑定防止当前点击触发清除)
+  setTimeout(() => {
+    document.addEventListener('click', clearTooltips, { once: true });
+  }, 10);
+
+  // 2. 3秒后自动消失 (如果还没被点击清除)
+  const timer = setTimeout(() => {
+    if (tooltip.parentElement) {
+       tooltip.remove();
+       document.removeEventListener('click', clearTooltips);
+    }
+  }, 3000);
 }
 
 export function renderFlashCard(poem: Poem) {
