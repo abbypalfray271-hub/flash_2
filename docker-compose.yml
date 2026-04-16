@@ -19,6 +19,7 @@ services:
       - "3008:3005"
     volumes:
       - ./server/data:/app/data
+      - ./server/backups:/app/backups
     restart: always
     networks:
       - guwen-network
