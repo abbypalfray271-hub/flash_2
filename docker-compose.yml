@@ -4,7 +4,7 @@ services:
   # 古文闪背 - 前端 (Vite + Nginx)
   guwen-frontend:
     build: .
-    container_name: guwen-flashback-frontend
+    container_name: guwen-flash-2-frontend
     ports:
       - "3007:80"
     restart: always
@@ -14,7 +14,7 @@ services:
   # 古文闪背 - 后端 (Node + SQLite)
   guwen-backend:
     build: ./server
-    container_name: guwen-flashback-backend
+    container_name: guwen-flash-2-backend
     ports:
       - "3006:3005"
     volumes:
