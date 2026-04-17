@@ -6,9 +6,9 @@ const API_BASE = '/api';
 
 export async function syncRegister(stats: UserStats): Promise<boolean> {
   try {
-    // 3秒超时，防止无后端时无限挂起
+    // 8秒超时，增加移动网络下的稳定性
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
+    const timeout = setTimeout(() => controller.abort(), 8000);
     const res = await fetch(`${API_BASE}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

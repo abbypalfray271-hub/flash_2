@@ -7,7 +7,7 @@ export interface Poem {
   author: string;                // "韩非"
   dynasty: string;               // "战国"
   source: string;                // "《韩非子》"
-  grade: 1 | 2 | 3 | 4 | 5 | 6;         // 年级
+  grade: 7 | 8 | 9;                     // 年级 (初一/初二/初三)
   semester: 1 | 2;              // 学期 (1: 上, 2: 下)
   category: 'prose' | 'poetry'; // 分类 (prose: 文言文, poetry: 古诗词)
   sentences: Sentence[];

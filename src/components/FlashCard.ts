@@ -252,17 +252,6 @@ export function renderFlashCard(poem: Poem) {
       }
     });
 
-    // 自动播放音频
-    if (isFullTextMode) {
-      const allUrls = poem.sentences.map(s => s.audioFile).filter(u => !!u) as string[];
-      playPlaylist(allUrls);
-    } else {
-      const sentence = poem.sentences[currentIndex];
-      if (sentence.audioFile) {
-        playClip(sentence.audioFile);
-      }
-    }
-
   };
 
   cardInner.addEventListener('click', () => {

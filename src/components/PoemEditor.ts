@@ -32,7 +32,7 @@ export function renderPoemEditor(existingPoem?: Poem) {
          <div class="input-group">
           <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.4rem;">年级</label>
           <select id="edit-grade" style="width: 100%; background: #2a2a2a; border: 1px solid var(--border); color: white; padding: 0.6rem; border-radius: 6px;">
-            ${[3,4,5,6].map(g => `<option value="${g}" ${existingPoem?.grade === g ? 'selected' : ''}>${g}年级</option>`).join('')}
+            ${[{g:7,label:'初一'},{g:8,label:'初二'},{g:9,label:'初三'}].map(({g,label}) => `<option value="${g}" ${existingPoem?.grade === g ? 'selected' : ''}>${label}</option>`).join('')}
           </select>
         </div>
         <div class="input-group">
@@ -118,11 +118,11 @@ export function renderPoemEditor(existingPoem?: Poem) {
     const text = rawInput.value.trim();
     if (!text) return;
     
-    // 正则拆分：句号、问号、叹号、分号、换行
-    const rawSentences = text.split(/[。！？；\n]/).filter(s => s.trim().length > 0);
+    // 正则拆分：使用 lookbehind 在标点后断句，自动保留标点符号
+    const rawSentences = text.split(/(?<=[。！？；])|[\n]/).filter(s => s.trim().length > 0);
     sentences = rawSentences.map((s, idx) => ({
       id: idx + 1,
-      text: s.trim() + (text.includes(s) && text[text.indexOf(s) + s.length].match(/[。！？；]/) ? text[text.indexOf(s) + s.length] : ''),
+      text: s.trim(),
       translation: ''
     }));
     renderSentences();

@@ -2,8 +2,8 @@
   /* Genshin Impact Color Palette: Starry Abyss & Primogem Gold */
   --bg: #111218;
   --bg-gradient: radial-gradient(circle at top, #2a2d44 0%, #111218 100%);
-  --card-bg: rgba(42, 45, 68, 0.75);
-  --card-bg-hover: rgba(58, 62, 88, 0.9);
+  --card-bg: rgba(42, 45, 68, 0.9); /* Increased opacity for fallback */
+  --card-bg-hover: rgba(58, 62, 88, 0.95);
   --text-main: #ece5d8; /* Paimon White / Parchment */
   --text-dim: #9496a5;
   --accent: #ffc107; /* Primogem Gold */
@@ -22,9 +22,9 @@
   --border: rgba(255, 255, 255, 0.1);
   --glass-blur: blur(12px);
   
-  /* Fonts */
-  --font-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
-  --font-serif: 'Noto Serif SC', serif;
+  /* Fonts (Updated to System Stacks) */
+  --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-serif: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'STZhongsong', serif;
   
   /* Spacing */
   --container-max-width: 600px;
@@ -49,6 +49,7 @@ body {
   font-family: var(--font-sans);
   line-height: 1.6;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
 }
 
@@ -56,6 +57,7 @@ body {
   max-width: var(--container-max-width);
   margin: 0 auto;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
@@ -72,7 +74,7 @@ body::before {
     radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
     radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
     radial-gradient(1px 1px at 50px 160px, #fff, rgba(0,0,0,0)),
-    radial-gradient(2px 2px at 80px 120px, #rgba(255,255,255,0.5), rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 80px 120px, rgba(255,255,255,0.5), rgba(0,0,0,0)),
     radial-gradient(1px 1px at 110px 210px, #fff, rgba(0,0,0,0)),
     radial-gradient(1px 1px at 150px 30px, #fff, rgba(0,0,0,0)),
     radial-gradient(1px 1px at 190px 110px, #fff, rgba(0,0,0,0));

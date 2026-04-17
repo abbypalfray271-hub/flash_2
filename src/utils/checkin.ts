@@ -1,20 +1,29 @@
 import { getUserStats, saveUserStats } from './storage';
 
 /**
- * 获取今天的日期字符串 (YYYY-MM-DD)
+ * 格式化日期为本地 YYYY-MM-DD（避免 toISOString 的 UTC 时区偏移问题）
  */
-export function getTodayStr(): string {
-  const now = new Date();
-  return now.toISOString().split('T')[0];
+function formatLocalDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 /**
- * 获取昨天的日期字符串
+ * 获取今天的日期字符串 (YYYY-MM-DD，本地时区)
+ */
+export function getTodayStr(): string {
+  return formatLocalDate(new Date());
+}
+
+/**
+ * 获取昨天的日期字符串 (本地时区)
  */
 export function getYesterdayStr(): string {
   const d = new Date();
   d.setDate(d.getDate() - 1);
-  return d.toISOString().split('T')[0];
+  return formatLocalDate(d);
 }
 
 /**
